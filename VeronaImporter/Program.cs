@@ -3,25 +3,65 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using OfficeOpenXml;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 class Program
 {
     static void Main(string[] args)
     {
-        string excelFilePath = @"C:\Users\Administrator\Desktop\Power\Verona\3 - GER 11 2024_finalTESTE.xlsx";
-        string connectionString = "Server=hoh2k2203.hmv.org.br;Database=OnBaseDev;User Id=hsi;Password=wstinol;TrustServerCertificate=True;Connection Timeout=900;";
-        string tableName = "VeronaTESTE";
+        Console.WriteLine("Starting the import process...");
+
+        // Load configuration
+        Console.WriteLine("Loading configuration...");
+        IConfiguration configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        // Get settings from configuration
+        string? excelFilePath = configuration["FilePath"];
+        string? connectionString = configuration.GetConnectionString("DefaultConnection");
+        string? tableName = configuration["TableName"];
+
+        if (string.IsNullOrWhiteSpace(excelFilePath))
+        {
+            Console.WriteLine("Error: File path is not provided in the configuration.");
+            return;
+        }
+        Console.WriteLine($"Excel file path: {excelFilePath}");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            Console.WriteLine("Error: Connection string is not provided in the configuration.");
+            return;
+        }
+        Console.WriteLine("Connection string loaded successfully.");
+
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            Console.WriteLine("Error: Table name is not provided in the configuration.");
+            return;
+        }
+        Console.WriteLine($"Target table: {tableName}");
 
         try
         {
+            // Read data from the Excel file
+            Console.WriteLine("Reading data from the Excel file...");
             DataTable dataTable = ReadExcelFile(excelFilePath);
+            Console.WriteLine($"Excel file read successfully. Rows: {dataTable.Rows.Count}, Columns: {dataTable.Columns.Count}");
 
             // Create the table if it doesn't exist
+            Console.WriteLine("Checking if the table exists and creating it if necessary...");
             CreateTableIfNotExists(dataTable, connectionString, tableName);
+            Console.WriteLine("Table checked/created successfully.");
 
             // Bulk insert data into the table
+            Console.WriteLine("Starting bulk insert into the database...");
             BulkInsertToDatabase(dataTable, connectionString, tableName);
-            Console.WriteLine("Data import completed successfully!");
+            Console.WriteLine("Bulk insert completed successfully.");
+
+            Console.WriteLine("Data import process completed successfully!");
         }
         catch (Exception ex)
         {
@@ -40,6 +80,8 @@ class Program
             int rows = worksheet.Dimension.Rows;
             int columns = worksheet.Dimension.Columns;
 
+            Console.WriteLine($"Reading Excel file. Rows: {rows}, Columns: {columns}");
+
             // Add columns to the DataTable
             for (int col = 1; col <= columns; col++)
             {
@@ -47,6 +89,7 @@ class Program
                 if (!string.IsNullOrEmpty(columnName))
                 {
                     dataTable.Columns.Add(columnName, typeof(string)); // Default to string
+                    Console.WriteLine($"Added column: {columnName}");
                 }
             }
 
@@ -70,6 +113,7 @@ class Program
         using (SqlConnection connection = new SqlConnection(connectionString))
         {
             connection.Open();
+            Console.WriteLine($"Checking if table '{tableName}' exists...");
 
             // Check if the table exists
             string checkTableQuery = $@"
@@ -81,6 +125,7 @@ class Program
             using (SqlCommand command = new SqlCommand(checkTableQuery, connection))
             {
                 command.ExecuteNonQuery();
+                Console.WriteLine($"Table '{tableName}' checked/created successfully.");
             }
         }
     }
@@ -105,19 +150,22 @@ class Program
         using (SqlConnection connection = new SqlConnection(connectionString))
         {
             connection.Open();
+            Console.WriteLine($"Starting bulk insert into '{tableName}'...");
+
             using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connection))
             {
                 bulkCopy.DestinationTableName = tableName;
-
                 bulkCopy.BulkCopyTimeout = 900;
 
                 // Map columns dynamically
                 foreach (DataColumn column in dataTable.Columns)
                 {
                     bulkCopy.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+                    Console.WriteLine($"Mapped column: {column.ColumnName}");
                 }
 
                 bulkCopy.WriteToServer(dataTable);
+                Console.WriteLine("Bulk insert operation completed.");
             }
         }
     }
