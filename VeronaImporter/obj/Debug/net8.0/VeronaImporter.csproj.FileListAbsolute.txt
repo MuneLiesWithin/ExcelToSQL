@@ -1,4 +1,5 @@
 C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\bin\Debug\net8.0\VeronaImporter.exe
+C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\bin\Debug\net8.0\appsettings.json
 C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\bin\Debug\net8.0\VeronaImporter.deps.json
 C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\bin\Debug\net8.0\VeronaImporter.runtimeconfig.json
 C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\bin\Debug\net8.0\VeronaImporter.dll
@@ -70,4 +71,3 @@ C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\obj\Debug\net8
 C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\obj\Debug\net8.0\VeronaImporter.pdb
 C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\obj\Debug\net8.0\VeronaImporter.genruntimeconfig.cache
 C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\obj\Debug\net8.0\ref\VeronaImporter.dll
-C:\Users\Administrator\source\repos\VeronaImporter\VeronaImporter\bin\Debug\net8.0\appsettings.json

@@ -9,7 +9,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Starting the import process...");
+        Console.WriteLine("Starting the import process..."+DateTime.Now);
 
         // Load configuration
         Console.WriteLine("Loading configuration...");
@@ -61,7 +61,7 @@ class Program
             BulkInsertToDatabase(dataTable, connectionString, tableName);
             Console.WriteLine("Bulk insert completed successfully.");
 
-            Console.WriteLine("Data import process completed successfully!");
+            Console.WriteLine("Data import process completed successfully!"+DateTime.Now);
         }
         catch (Exception ex)
         {
